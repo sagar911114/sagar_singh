@@ -1,59 +1,47 @@
-package testPlan;
-
-import java.util.concurrent.TimeUnit;
+package testSuites;
 
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import library.ExcelDataConfig;
+import library.LoginPageAction;
+import library.TestBase;
 
 
 
 public class LoginPage {
 	
-	
-	WebDriver driver;
 
 		@Test(dataProvider="ExcelData")
 		public void LoginTest(String username, String password) {
 			
-			System.setProperty("webdriver.chrome.driver","C:\\Users\\Sagar\\Desktop\\chromedriver.exe\\");
-			driver= new ChromeDriver();
-			driver.get("http://demosite.center/wordpress/wp-login.php");
-			driver.manage().window().maximize();
-			driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
-			
-			LoginPageFac login=PageFactory.initElements(driver, LoginPageFac.class);
+			TestBase tb= new TestBase();
+			try {
+			tb.IntiateBrowserForURL("http://demosite.center/wordpress/wp-login.php");
+			LoginPageAction login=PageFactory.initElements(TestBase.driver, LoginPageAction.class);
 			
 			login.uId.sendKeys(username);
 			login.passId.sendKeys(password);
 			login.button_link.click();
 			
-			String actual_title=driver.getTitle();
+			String actual_title=TestBase.driver.getTitle();
 			
-			String expected_title="Dashboard ‹ WordPress Demo Install — WordPress";
-			
+			String expected_title="Dashboard ‹ Wordpress Demo Site at Demo.Center — WordPress";
 			Assert.assertEquals(actual_title, expected_title);
-			
-		}
-		
-		
-		@AfterMethod
-		public void tearDown() {
-			driver.quit();
+			}
+			finally {
+				tb.tearDown();
+			}
 		}
 		
 		@DataProvider(name="ExcelData")
 		public Object[][] dataValue(){
 			
 			//We will import data from excel separate class and calling that class here by creating object
-			ExcelDataConfig config= new ExcelDataConfig("E:\\DataSheet.xlsx");
+			ExcelDataConfig config= new ExcelDataConfig("C:\\Users\\Sagar\\git\\DemoGitHub\\DataDrivenFrameWork\\ExcelData\\DataSheet.xlsx");
 			
 			int rows=config.getRowCount(0);
 			
@@ -66,8 +54,6 @@ public class LoginPage {
 				
 			}
 			return data;
-			
 		}
 
 	}
-
